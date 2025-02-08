@@ -6,17 +6,15 @@ public class Show {
     private Screen screen;
     private LocalTime start_time;
     private LocalTime end_time;
-    private List<LocalTime> showTimings ;
     private LocalDate date;
     private int price;
     private HashMap<Character, List<String>>seatarr = new HashMap<>();
 
 
-    public Show(LocalTime start_time, LocalTime end_time, Screen screen, List<LocalTime>showTimings,int price, HashMap<Character, List<String>>seatarr) {
+    public Show(LocalTime start_time, LocalTime end_time, Screen screen, int price, HashMap<Character, List<String>>seatarr) {
         this.start_time = start_time;
         this.end_time = end_time;
         this.screen = screen;
-        this.showTimings = showTimings;
         this.price = price;
         this.seatarr = seatarr;
 
@@ -32,10 +30,6 @@ public class Show {
 
     public LocalTime getEnd_time(){
         return end_time;
-    }
-
-    public List<LocalTime>getShowTimings(){
-        return showTimings;
     }
 
     public int getPrice(){

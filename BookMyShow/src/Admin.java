@@ -1,10 +1,8 @@
-import java.time.LocalTime;
-import java.util.ArrayList;
+
 
 public class Admin {
     private String username;// Username for the user
     private String password;// Password to store pass
-    static ArrayList<LocalTime> showTimings = new ArrayList<>();
 
     protected Admin(String username, String password){
         this.username = username;
@@ -21,7 +19,4 @@ public class Admin {
         return password;
     }
 
-    public static ArrayList<LocalTime> getLocaltime() {
-        return showTimings;
-    }
 }

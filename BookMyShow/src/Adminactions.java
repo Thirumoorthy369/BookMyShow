@@ -1,6 +1,5 @@
-import java.util.*;
 import java.time.*;
-
+import java.util.*;
 
 public class Adminactions {
 
@@ -24,7 +23,6 @@ public class Adminactions {
     }
 
     public static void addTheatre(Scanner scanner) {
-
         System.out.println("Enter the theatre name to add:");
         String theatrename = scanner.nextLine();
         System.out.println("Enter the location:");
@@ -40,19 +38,26 @@ public class Adminactions {
         int screens = Integer.parseInt(scanner.nextLine());
         HashMap<String, Screen> screenHashMap = new HashMap<>();
         while (screens != 0) {
-            System.out.print("Enter the name of the screen:");
-            String scrn_name = scanner.nextLine();
-            System.out.print("Enter the no.of seats  :");
-            int seats_count = Integer.parseInt(scanner.nextLine());
-            System.out.print("Enter the grid (eg: 2*4*2):");
-            String scrgrid = scanner.nextLine();
-            var griden = Utilities.generatingpatternseat(seats_count, scrgrid);
-            if (griden == null) {
-                continue;
+            for(int i = 1;i<=screens;i++) {
+                System.out.print("Enter the name of the screen:");
+                String scrn_name = scanner.nextLine();
+
+                if (screenHashMap.containsKey(scrn_name)){
+                    System.out.println("The given screen name is already exist in the theatre, give some unique name..!");
+                    continue;
+                }
+                System.out.print("Enter the no.of seats  :");
+                int seats_count = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter the grid (eg: 2*4*2):");
+                String scrgrid = scanner.nextLine();
+                var griden = Utilities.generatingpatternseat(seats_count, scrgrid);
+                if (griden == null) {
+                    continue;
+                }
+                Screen screen = (new Screen(scrn_name, seats_count, griden, scrgrid));
+                screenHashMap.put(scrn_name, screen);
+                screens--;
             }
-            Screen screen = (new Screen(scrn_name, seats_count, griden, scrgrid));
-            screenHashMap.put(scrn_name, screen);
-            screens--;
         }
 
         Theatre theatre = new Theatre(theatrename, screenHashMap, location);
@@ -60,8 +65,8 @@ public class Adminactions {
         System.out.println("Theatre added successfully!");
     }
 
-
     public static void addMovie(Scanner scanner) {
+        String screenName;
 
         System.out.println("Enter the movie name:");
         String movieName = scanner.nextLine();
@@ -87,6 +92,12 @@ public class Adminactions {
         System.out.println("Enter the Duration of the movie (in minutes):");
         long duration = Long.parseLong(scanner.nextLine());
 
+        System.out.println("Available theatres");
+        for (var theatreEntry : BookMyShow.getTheatrelist().entrySet()) {
+            var theatre = theatreEntry.getValue();
+            System.out.println(theatre.getTheatreName());
+        }
+
         System.out.println("Enter the theatre name:");
         String theatreName = scanner.nextLine();
 
@@ -97,12 +108,25 @@ public class Adminactions {
 
         Theatre theatre = BookMyShow.getTheatrelist().get(theatreName);
 
-        System.out.println("Enter the screen name:");
-        String screenName = scanner.nextLine();
+        System.out.println("Available Screens:");
+        for (var screenEntry : theatre.getScreenwrap().entrySet()) {
+            var screen = screenEntry.getValue();
+            System.out.println(screen.getScreenName());
+        }
 
-        if (!theatre.getScreenwrap().containsKey(screenName)) {
-            System.out.println("Screen not found!");
-            return;
+        System.out.println("Enter the screen name:");
+        screenName = scanner.nextLine();
+
+        x :while (true) {
+            for (var movies : theatre.getScreenwrap().entrySet()) {
+                if (!movies.getKey().contains(screenName)) {
+                    System.out.println("Screen not found!");
+                    continue x;
+                }
+                else {
+                    break x;
+                }
+            }
         }
 
         Screen screen = theatre.getScreenwrap().get(screenName);
@@ -112,76 +136,70 @@ public class Adminactions {
         LocalTime endingTime = startingTime.plusMinutes(duration + 30); // Including buffer time
 
         // Check if the show timing conflicts with existing shows
-        boolean conflict = false;
+        boolean interrupt = false;
         for (var existingShow : BookMyShow.getShowlist().getOrDefault(screen.getScreenName(), new ArrayList<>())) {
             if ((startingTime.isBefore(existingShow.getEnd_time()) && startingTime.isAfter(existingShow.getStart_time())) ||
                     (endingTime.isAfter(existingShow.getStart_time()) && endingTime.isBefore(existingShow.getEnd_time())) ||
                     startingTime.equals(existingShow.getStart_time()) ||
                     endingTime.equals(existingShow.getEnd_time())) {
-                conflict = true;
+                interrupt = true;
                 break;
             }
         }
 
-        if (conflict) {
-            System.out.println("Show timing conflicts with an existing show. Please choose a different time.");
+        if (interrupt) {
+            System.out.println("Show timing interrupts with an existing show. Please choose a different time.");
             return;
         }
+
         System.out.println("Enter the price of the single ticket :");
         int price = 0;
         try {
-            //gettingt he price for the ticket
+            //getting the price for the ticket
             price = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
             System.out.println("Invalid ticket price!");
         }
 
         var seatArrangement = Utilities.generatingpatternseat(screen.getNoOfSeats(), screen.getScrn_grid());
-        Show newShow = new Show(startingTime, endingTime, screen, new ArrayList<>(Admin.showTimings), price, seatArrangement);
+        Show newShow = new Show(startingTime, endingTime, screen, price, seatArrangement);
 
-        BookMyShow.getShowlist().computeIfAbsent(screen.getScreenName(), k -> new ArrayList<>()).add(newShow);
-
-        LocalDate startDate = null, endDate = null;
-        System.out.println("Enter the start date (dd-MM-yyyy):");
-        try {
-            startDate = LocalDate.parse(scanner.nextLine(), BookMyShow.getDateformat());
-        } catch (Exception e) {
-            System.out.println("Invalid format..!");
+        // Check if the movie already exists in the same screen
+        List<Movie> movies = BookMyShow.getMovielist().get(movieName);
+        if (movies == null) {
+            movies = new ArrayList<>();
         }
 
-        System.out.println("Enter the end date (dd-MM-yyyy):");
-        try {
-            endDate = LocalDate.parse(scanner.nextLine(), BookMyShow.getDateformat());
-        } catch (Exception e) {
-            System.out.println("Invalid format..!");
+        boolean movieExists = false;
+        for (Movie movie : movies) {
+            if (movie.getScreen().getScreenName().equals(screenName) && movie.getStart_date().isEqual(LocalDate.now())) {
+                movieExists = true;
+                break;
+            }
         }
+         if (!movieExists) {
+             BookMyShow.getShowlist().computeIfAbsent(screen.getScreenName(), k -> new ArrayList<>()).add(newShow);
+             LocalDate startDate = null;
+             System.out.println("Enter the start date (dd-MM-yyyy):");
+             try {
+                 startDate = LocalDate.parse(scanner.nextLine(), BookMyShow.getDateformat());
+             } catch (Exception e) {
+                 System.out.println("Invalid format..!");
+             }
 
-        System.out.print("Enter the number of show timings: ");
-        int numberOfTimings = Integer.parseInt(scanner.nextLine());
-        List<LocalTime> showTimings = new ArrayList<>();
+             Movie newMovie = new Movie(movieName, location, startDate, (int) duration, theatre, screen, newShow);
+             BookMyShow.getMovielist().computeIfAbsent(movieName, k -> new ArrayList<>()).add(newMovie);
 
-        for (int i = 1; i <= numberOfTimings; i++) {
-            System.out.print("Enter show time " + i + " (HH:mm): ");
-            showTimings.add(LocalTime.parse(scanner.nextLine()));
-        }
-
-        Admin.showTimings.clear();
-        Admin.showTimings.addAll(showTimings);
-
-        Movie newMovie = new Movie(movieName, location, startDate, (int) duration, theatre, screen, newShow);
-        BookMyShow.getMovielist().computeIfAbsent(movieName, k -> new ArrayList<>()).add(newMovie);
-
-        System.out.println("Movie successfully scheduled!");
-        System.out.println("Movie Name: " + movieName);
-        System.out.println("Theatre: " + theatreName);
-        System.out.println("Screen: " + screenName);
-        System.out.println("Dates: " + startDate + " to " + endDate);
-        System.out.println("Show Timings:");
-        for (LocalTime time : Admin.showTimings) {
-            System.out.println(" - " + time);
-        }
+             System.out.println("Movie successfully scheduled!");
+             System.out.println("Movie Name: " + movieName);
+             System.out.println("Theatre: " + theatreName);
+             System.out.println("Screen: " + screenName);
+             System.out.println("Dates: " + startDate);
+             System.out.println("Show Timings:" + startingTime);
+         } else {
+             System.out.println("Movie already scheduled in this screen at the same time.");
+         }
     }
-
 
     public static void viewTheatres() {
         for (var temp : BookMyShow.getTheatrelist().keySet()) {
@@ -203,6 +221,7 @@ public class Adminactions {
             }
         }
     }
+
     public static void viewMovies() {
         // Check if there are any movies in the system
         if (BookMyShow.getMovielist().isEmpty()) {
@@ -229,14 +248,10 @@ public class Adminactions {
                 Show show = movie.getShow();
                 System.out.println("  Show Start Time: " + show.getStart_time());
                 System.out.println("  Show End Time: " + show.getEnd_time());
-                System.out.println("  Show Timings: ");
+                System.out.println("  Show Timings: "+ show.getStart_time()+ " to " + show.getEnd_time());
 
-                for (LocalTime time : show.getShowTimings()) {
-                    System.out.println("    - " + time);
-                }
                 System.out.println();
             }
         }
     }
-
 }

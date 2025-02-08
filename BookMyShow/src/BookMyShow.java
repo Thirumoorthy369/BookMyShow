@@ -6,7 +6,6 @@ public class BookMyShow {
     private static List<User>userList = new ArrayList<>();
     private static HashMap<String,Theatre> theatreList = new HashMap<>();
     private static HashMap<String,Screen>screenHash = new HashMap<>();
-    //private static HashMap<String,List<MovieShow>>movieshowlist = new HashMap<>();
     private static HashMap<String,List<Movie>>movielist = new HashMap<>();
     private static HashMap<String,List<Show>>showlist = new HashMap<>();
     private static DateTimeFormatter dateformat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -14,7 +13,7 @@ public class BookMyShow {
 
 
 
-
+ //getters and setters for all the initilizations (variables)
     public static List<Admin> getAdminlist() {
         return adminList;
     }
@@ -27,10 +26,6 @@ public class BookMyShow {
     public static HashMap<String, Screen> getScreenlist(){
         return screenHash;
     }
-
-//    public static HashMap<String,List<MovieShow>>getMovieshowlist(){
-//        return movieshowlist;
-//    }
 
     public static HashMap<String,List<Movie>>getMovielist(){ return movielist;}
     public static HashMap<String,List<Show>>getShowlist(){

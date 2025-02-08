@@ -1,5 +1,5 @@
-public class Main {
+public class Main { //main Class
     public static void main(String[] args) {
-        BookMyShowactions.start();
+        BookMyShowactions.start(); //calling start method
     }
-}       
+}

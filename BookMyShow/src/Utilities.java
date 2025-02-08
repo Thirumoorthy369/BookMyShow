@@ -9,7 +9,7 @@ public class Utilities {
         int counter = 0;
         for(String grid: splitscreen){
             int temp = Integer.parseInt(grid);
-            sum=sum+temp; //2*4*2
+            sum=sum+temp;
             counter++;
         }
         if(count % sum == 0)

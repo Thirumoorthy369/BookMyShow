@@ -15,10 +15,6 @@ public class Screen {
         this.scrn_grid = scrn_grid;
     }
 
-    public Screen() {
-
-    }
-
     public String getScreenName() {
        return screenName;
    }

@@ -59,12 +59,12 @@ public class BookMyShowactions {
         boolean exit = false;
         while (!exit) {
             System.out.println("Admin menu list:");
-            System.out.print("1.Add theatre \n 2.Add movies \n 3.View Theatres \n 4.View Movies list \n 5.exit \n Enter your choice:");
+            System.out.print(" 1.Add theatre \n 2.Add movies \n 3.View Theatres \n 4.View Movies list \n 5.exit \n Enter your choice:");
             input = Integer.parseInt(sc.nextLine());
 
             switch (input) {
                 case 1:
-                    //calling the add theatre mathoed from admin actions
+                    //calling the add theatre mathod from admin actions
                     Adminactions.addTheatre(sc);
                     break;
                 case 2:
@@ -87,19 +87,18 @@ public class BookMyShowactions {
     }
 
     public static void usermenulist(Scanner sc,User user) {
-        int input;
         boolean exit = false;
         while (!exit) {
             System.out.println("User menu list:");
-            System.out.print("1. Book Ticket \n2. Change Location/Date \n3. View Ticket \n4. Exit \nEnter your choice:");
-            input = Integer.parseInt(sc.nextLine());
+            System.out.print(" 1. Book Ticket \n2. Change Location/Date \n3. View Ticket \n4. Exit \nEnter your choice:");
+            int input = Integer.parseInt(sc.nextLine());
 
             switch (input) {
                 case 1:
-                    Useractions.Movieslist(user, LocalDate.now());
+                    Useractions.Movieslist(user);
                     break;
                 case 2:
-                    Useractions.changeLocationorDate(user, LocalDate.now());
+                    Useractions.changeLocationOrDate(user, LocalDate.now());
                     break;
                 case 3:
                     Useractions.viewTickets(user);
@@ -114,4 +113,3 @@ public class BookMyShowactions {
         }
     }
 }
-
